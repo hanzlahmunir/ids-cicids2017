@@ -1,0 +1,56 @@
+# ───────────────── Data — never commit ─────────────────
+# The CICIDS-2017 dataset is public — users download it themselves.
+dataset/
+*.zip
+*.parquet
+*.npz
+*.joblib
+
+# Intermediate Kaggle / Colab output dirs
+preprocessed/
+engineered/
+selected/
+working/
+
+# ───────────────── Reports & figures (generated) ─────────────────
+# These are produced by re-running the notebooks. The rendered output
+# notebooks under outputs/ already preserve the same plots inline,
+# so we don't also commit the raw PNGs.
+figures/
+*.png
+*.jpg
+*.jpeg
+*Report*.txt
+*Report*.md
+
+# But keep the README and the rendered output notebooks
+!README.md
+!outputs/*.ipynb
+
+# ───────────────── Reference / scratch ─────────────────
+old/
+scratch/
+tmp/
+.ipynb_checkpoints/
+
+# ───────────────── Python ─────────────────
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+env/
+.python-version
+
+# ───────────────── Editor / OS ─────────────────
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ───────────────── Secrets ─────────────────
+.env
+*.key
+*.pem
+kaggle.json
