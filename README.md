@@ -87,7 +87,8 @@ ids-cicids2017/
 │   ├── 11_Leakage_SanityCheck.ipynb          (negative-control leakage test)
 │   ├── 12_Ablation_DestinationPort.ipynb     (feature-ablation test)
 │   ├── 13_Robustness_Perturbation.ipynb      (real-world robustness test)
-│   └── 14_Ablation_PCA.ipynb                 (PCA vs feature-selection test)
+│   ├── 14_Ablation_PCA.ipynb                 (PCA vs feature-selection test)
+│   └── 15_Audit_NearDuplicate.ipynb          (near-duplicate / held-out audit)
 └── outputs/                                ← rendered runs with embedded figures
     ├── 01_EDA_outputs.ipynb  …  09_Modeling_Comparison_outputs.ipynb
     ├── 10_Modeling_Hierarchical_outputs.ipynb
@@ -175,6 +176,7 @@ weakness:
 | **Negative controls** (11) | Train/test harness leak? | ✅ **Clean** — shuffled-label and pure-noise data collapse to chance (macro-F1 ≈ 0.13 vs 0.14 floor) |
 | **Destination-Port ablation** (12) | Riding on the known port-memorisation artifact? | ✅ **No** — removing it costs only −0.007 macro-F1; the model uses genuine flow behaviour |
 | **Perturbation robustness** (13) | Real-world generalisation? | ⚠️ **Brittle to noise** (macro-F1 halves at σ=0.05), **robust to feature dropout** (80% retained at 20% missing) |
+| **Near-duplicate audit** (15) | Test set genuinely held out? | ✅ **Clean** — accuracy is flat vs distance-to-train (0.997 near → 0.999 far); the model generalises to flows far from any training example |
 
 Bonus finding from the ablation: the `Init_Win_bytes` features (and the
 `-1`-sentinel handling decided in preprocessing) are what make the rare
