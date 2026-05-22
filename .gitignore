@@ -21,10 +21,10 @@ figures/
 *.jpg
 *.jpeg
 *Report*.txt
-*Report*.md
 
-# But keep the README and the rendered output notebooks
+# But keep the README, the curated project report, and the rendered notebooks
 !README.md
+!PROJECT_REPORT.md
 !outputs/*.ipynb
 
 # ───────────────── Reference / scratch ─────────────────

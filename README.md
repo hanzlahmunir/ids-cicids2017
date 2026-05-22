@@ -82,18 +82,22 @@ ids-cicids2017/
 │   ├── 06_Modeling_Multiclass.ipynb          (scratch softmax LR)
 │   ├── 07_Modeling_Binary_MLP.ipynb          (scratch MLP)
 │   ├── 08_Modeling_Multiclass_MLP.ipynb      (scratch MLP)
-│   └── 09_Modeling_Comparison.ipynb          (RF + XGBoost reference)
+│   ├── 09_Modeling_Comparison.ipynb          (RF + XGBoost reference)
+│   ├── 10_Modeling_Hierarchical.ipynb        (two-stage cascade experiment)
+│   ├── 11_Leakage_SanityCheck.ipynb          (negative-control leakage test)
+│   ├── 12_Ablation_DestinationPort.ipynb     (feature-ablation test)
+│   └── 13_Robustness_Perturbation.ipynb      (real-world robustness test)
 └── outputs/                                ← rendered runs with embedded figures
-    ├── 01_EDA_outputs.ipynb
-    ├── 02_Preprocessing_outputs.ipynb
-    ├── 03_FeatureEngineering_outputs.ipynb
-    ├── 04_FeatureSelection_outputs.ipynb
-    ├── 05_Modeling_Binary_outputs.ipynb
-    ├── 06_Modeling_Multiclass_outputs.ipynb
-    ├── 07_Modeling_Binary_MLP_outputs.ipynb
-    ├── 08_Modeling_Multiclass_MLP_outputs.ipynb
-    └── 09_Modeling_Comparison_outputs.ipynb
+    ├── 01_EDA_outputs.ipynb  …  09_Modeling_Comparison_outputs.ipynb
+    ├── 10_Modeling_Hierarchical_outputs.ipynb
+    ├── 11_Leakage_SanityCheck_outputs.ipynb
+    ├── 12_Ablation_DestinationPort_outputs.ipynb
+    └── 13_Robustness_Perturbation_outputs.ipynb
 ```
+
+A full narrative write-up of the whole project — problem, approach, every
+design decision, results, and validation — is in
+[`PROJECT_REPORT.md`](PROJECT_REPORT.md).
 
 The dataset itself is **not** in this repository — download it from the
 Canadian Institute for Cybersecurity:
@@ -156,6 +160,33 @@ four-model × two-task comparison:
 | Binary, ~5:1 imbalance | **No real difference** — pick the simpler option (class-weighting; no 394 MB SMOTE artifact, 40% faster training). |
 | Multi-class, ~1000:1 imbalance, **linear / MLP models** | SMOTE wins by +0.06 – +0.09 macro-F1 — synthetic samples give the model boundaries to fit, where re-weighting alone breaks down. |
 | Multi-class, ~1000:1 imbalance, **tree ensembles** | **Tie** — RF and XGBoost handle imbalance well internally; SMOTE doesn't add much. |
+
+---
+
+## Is the 99% real? — Validation & robustness
+
+Scores above 95% warrant suspicion of data leakage, so we ran three
+independent checks (notebooks 11–13). Two clean passes and one honest
+weakness:
+
+| Test | Question | Verdict |
+|---|---|---|
+| **Negative controls** (11) | Train/test harness leak? | ✅ **Clean** — shuffled-label and pure-noise data collapse to chance (macro-F1 ≈ 0.13 vs 0.14 floor) |
+| **Destination-Port ablation** (12) | Riding on the known port-memorisation artifact? | ✅ **No** — removing it costs only −0.007 macro-F1; the model uses genuine flow behaviour |
+| **Perturbation robustness** (13) | Real-world generalisation? | ⚠️ **Brittle to noise** (macro-F1 halves at σ=0.05), **robust to feature dropout** (80% retained at 20% missing) |
+
+Bonus finding from the ablation: the `Init_Win_bytes` features (and the
+`-1`-sentinel handling decided in preprocessing) are what make the rare
+classes learnable — removing them collapses Bot/Infiltration (0.80 → 0.07)
+and Web Attack (0.97 → 0.25).
+
+We also tested a **two-stage cascade** (notebook 10): a BENIGN/ATTACK gate
+feeding an attack-only specialist. It lifts the weaker MLP (+0.062 macro-F1
+end-to-end) but slightly hurts XGBoost (−0.044), since a strong flat model
+gains nothing from the extra error-prone gate.
+
+Full details and honest caveats are in
+[`PROJECT_REPORT.md`](PROJECT_REPORT.md) §4b–4c.
 
 ---
 
