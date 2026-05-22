@@ -86,7 +86,8 @@ ids-cicids2017/
 │   ├── 10_Modeling_Hierarchical.ipynb        (two-stage cascade experiment)
 │   ├── 11_Leakage_SanityCheck.ipynb          (negative-control leakage test)
 │   ├── 12_Ablation_DestinationPort.ipynb     (feature-ablation test)
-│   └── 13_Robustness_Perturbation.ipynb      (real-world robustness test)
+│   ├── 13_Robustness_Perturbation.ipynb      (real-world robustness test)
+│   └── 14_Ablation_PCA.ipynb                 (PCA vs feature-selection test)
 └── outputs/                                ← rendered runs with embedded figures
     ├── 01_EDA_outputs.ipynb  …  09_Modeling_Comparison_outputs.ipynb
     ├── 10_Modeling_Hierarchical_outputs.ipynb

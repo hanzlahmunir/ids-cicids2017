@@ -739,6 +739,39 @@ in linear space can become correlated once both are log-transformed (or
 vice versa). The feature-selection pass at the same threshold caught **15
 new redundant pairs** that appeared only after the transform.
 
+### 5.7  Why we used feature selection rather than PCA
+
+A common reviewer question is *"did you try PCA?"* — we did, and rejected it
+with evidence (notebook 14). PCA was the wrong tool here for four reasons,
+three a priori and one empirical:
+
+1. **No dimensionality problem.** PCA earns its keep at hundreds/thousands
+   of features. We have 47, which tree models and a small MLP handle
+   trivially. PCA needed **20 of 47 components just to retain 95 % of the
+   variance** — minimal compression, confirming there was little redundant
+   variance left to remove after feature selection.
+2. **PCA optimises variance, not class separation.** The empirical result
+   shows this directly: no PCA setting matched the full features, and the
+   gap was **larger on multi-class macro-F1 (−0.014) than on binary F1
+   (−0.001)**. PCA's variance-driven mixing dilutes the low-variance
+   features that distinguish the *rare* attack classes — exactly the signal
+   the project depends on.
+3. **It destroys interpretability.** Components are linear blends of all 47
+   originals; we could no longer state that `Init_Win` is the rare-class
+   signal — our most valuable finding.
+4. **Tree models are rotation-sensitive in the wrong direction for PCA** —
+   they split on individual features, so rotating the space tends to make
+   them slightly worse, which is what we observed.
+
+| Feature set | Binary F1 | Multi macro-F1 |
+|---|---:|---:|
+| Full 47 features | 0.9958 | 0.9639 |
+| PCA-30 (best) | 0.9945 | 0.9497 |
+| PCA-20 (95 % var) | 0.9942 | 0.9416 |
+
+Verdict: correlation-based feature selection is the better choice here —
+equal-or-better performance *and* full interpretability.
+
 ---
 
 ## 6. Limitations and honest caveats
