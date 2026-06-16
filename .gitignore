@@ -6,6 +6,13 @@ dataset/
 *.npz
 *.joblib
 
+# Demo model assets are large + reproducible from Kaggle — don't commit.
+# (the small label_mapping.csv + the demo_assets/README are kept explicitly)
+demo/demo_assets/xgb_multi_best.json
+demo/demo_assets/*.parquet
+node_modules/
+demo/frontend/.cache/
+
 # Intermediate Kaggle / Colab output dirs
 preprocessed/
 engineered/

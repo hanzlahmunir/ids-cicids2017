@@ -864,9 +864,46 @@ In rough priority order:
    "80 % of these are positive." Platt scaling or isotonic regression
    on the validation split would tighten the probabilities — useful if
    the IDS is going to use thresholds other than 0.5.
-4. **A streaming-inference demo** — load the saved model weights and
-   classify a single network flow end to end. Useful for showing the
-   pipeline runs in production-like conditions without retraining.
+4. **Live packet capture.** The demo (§7b) replays held-out flows; a real
+   deployment would capture packets off a network interface and turn them
+   into the 78 flow features with a CICFlowMeter-style pipeline. We did not
+   build this — see §7b for the technical and scientific reasons (chiefly the
+   distribution-shift sensitivity documented in §4c).
+
+---
+
+## 7b. Interactive demo — "NetShield AI" dashboard
+
+To make the work tangible we built a small web dashboard that runs the **real
+trained XGBoost model** live. It is a *demo of a model*, not a deployed product,
+and it is scrupulously honest about which parts are real.
+
+**Architecture.** A **FastAPI** backend loads `xgb_multi_best.json` and exposes:
+`/api/metrics` (confusion matrix + per-class P/R/F1 computed live on the held-out
+test set), `/api/importance` (the model's real feature importances), and a
+WebSocket `/api/stream` that replays held-out test flows through the model on a
+timer. A React frontend (adapted from a Claude-Design SOC mockup) renders it.
+
+**What is real vs illustrative.** Four screens are wired to the real model and
+labelled as such; the remaining mockup screens are tagged **`CONCEPT`** in the UI
+so no viewer can mistake them for real output:
+
+| Screen | Real? | Content |
+|---|---|---|
+| Live Detection | ✅ | scenario switch (Normal / Under Attack / DDoS / PortScan / …) streaming real flows through the model, with live accuracy, detection rate, false-positive rate |
+| ML Analytics | ✅ | confusion matrix + per-class F1 computed live on the test set |
+| Explainability | ✅ | real global feature importance (top: `Bwd Packet Length Min`, `bwd_header_ratio`, `Init_Win`) |
+| Live Traffic / Threats / API / etc. | ⚪ CONCEPT | illustrative mockup, explicitly tagged |
+
+**Why the "live" feed is a replay, not packet capture.** Classifying a real
+packet stream needs the 78 CICFlowMeter flow features, which requires a separate
+flow-assembly pipeline; and per §4c the model is sensitive to feature-distribution
+shift, so traffic captured outside the CICIDS-2017 testbed would yield many false
+positives. The replay of held-out flows is therefore both more honest (real ML on
+real attack data) and more reliable for a live presentation. Real packet capture
+is the natural next step and is listed as future work.
+
+The demo lives in `demo/` with a full run guide in `demo/README.md`.
 
 ---
 

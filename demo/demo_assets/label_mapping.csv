@@ -1,0 +1,8 @@
+label,index
+BENIGN,0
+Bot/Infiltration,1
+Brute Force,2
+DDoS,3
+DoS,4
+PortScan,5
+Web Attack,6
